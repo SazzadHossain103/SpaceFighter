@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Fighter Game: Lab Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 7px 0;
+            position: sticky;
+            width: 100%;
+            top: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #444;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #4CAF50;
+            color: white;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Space Fighter Game: Lab Report</h1>
+</header>
+
+<div class="container">
+    <section>
+        <h2>Project Overview</h2>
+        <p>The Space Fighter Game is an arcade-style shooting game developed using Python and the Pygame library. This report provides a detailed breakdown of the code structure, including descriptions of every function and its role in the game. The game challenges players to control a spaceship, avoid obstacles, collect coins and power-ups, and shoot down enemies.</p>
+    </section>
+
+    <section>
+        <h2>Game Structure</h2>
+        <h3>Initialization</h3>
+        <ul>
+            <li><strong>Pygame Initialization:</strong> The game begins by initializing Pygame with <code>pygame.init()</code>.</li>
+            <li><strong>Screen Setup:</strong> The game window is set to 800x700 pixels.</li>
+            <li><strong>Global Variables:</strong> These include player attributes, obstacle parameters, coin and power-up configurations, and the score.</li>
+            <li><strong>Asset Loading:</strong> Backgrounds, player sprites, obstacles, and other images are loaded and scaled to fit the game dimensions.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Functions and Their Roles</h2>
+        <article>
+            <h3>1. <code>is_overlapping</code></h3>
+            <p><strong>Purpose:</strong> Determines if two rectangles overlap. Used to check collisions between game elements like obstacles and the player.</p>
+            <p><strong>Parameters:</strong></p>
+            <ul>
+                <li><code>x1, y1, w1, h1:</code> Coordinates and dimensions of the first rectangle.</li>
+                <li><code>x2, y2, w2, h2:</code> Coordinates and dimensions of the second rectangle.</li>
+            </ul>
+            <p><strong>Returns:</strong> Boolean indicating overlap.</p>
+        </article>
+
+        <article>
+            <h3>2. <code>create_obstacle</code></h3>
+            <p><strong>Purpose:</strong> Spawns new obstacles at random x-coordinates while avoiding overlaps with other objects.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Attempts up to 20 times to place the obstacle without overlapping.</li>
+                <li>Increments the obstacle count and spawns coins or power-ups periodically.</li>
+            </ul>
+        </article>
+
+        <!-- Additional functions described similarly -->
+
+    </section>
+
+    <section>
+        <h2>Dependencies</h2>
+        <h3>Pygame</h3>
+        <ul>
+            <li><code>pygame.init()</code>: Initializes the Pygame library.</li>
+            <li><code>pygame.display.set_mode()</code>: Sets up the game window.</li>
+            <li><code>pygame.display.set_caption()</code>: Sets the window title.</li>
+            <li><code>pygame.image.load()</code>: Loads images for the game.</li>
+            <li><code>pygame.transform.scale()</code>: Resizes images.</li>
+            <li><code>pygame.surfarray.make_surface()</code>: Converts video frames to Pygame surfaces.</li>
+            <li><code>pygame.font.SysFont()</code>: Creates fonts for rendering text.</li>
+            <li><code>pygame.draw.rect()</code>: Draws rectangles for bullets.</li>
+            <li><code>pygame.key.get_pressed()</code>: Captures real-time key presses.</li>
+            <li><code>pygame.event.get()</code>: Processes user events like key presses and quits.</li>
+            <li><code>pygame.quit()</code>: Closes the Pygame application.</li>
+            <li><code>pygame.time.Clock()</code>: Controls the frame rate.</li>
+        </ul>
+        <h3>OpenCV</h3>
+        <ul>
+            <li><code>cv2.VideoCapture()</code>: Opens video files.</li>
+            <li><code>cv2.VideoCapture.read()</code>: Reads frames from a video.</li>
+            <li><code>cv2.CAP_PROP_POS_FRAMES</code>: Sets or gets the current frame position in a video.</li>
+            <li><code>cv2.cvtColor()</code>: Converts image colors (not used explicitly in this code).</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Execution Steps</h2>
+        <ol>
+            <li>Ensure required libraries are installed:</li>
+            <pre><code>pip install pygame opencv-python</code></pre>
+            <li>Place all required assets (images and video) in the specified directories.</li>
+            <li>Run the game script:</li>
+            <pre><code>python game.py</code></pre>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Future Improvements</h2>
+        <ul>
+            <li>Introduce more levels with varying difficulties.</li>
+            <li>Add more enemy types and power-ups.</li>
+            <li>Enhance visual effects and animations.</li>
+            <li>Implement multiplayer functionality.</li>
+        </ul>
+    </section>
+</div>
+
+<footer>
+    <p>&copy; 2024 Space Fighter Game: Lab Report</p>
+</footer>
+
+</body>
+</html>
