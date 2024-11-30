@@ -17,10 +17,10 @@
             background-color: #4CAF50;
             color: white;
             text-align: center;
-            padding: 7px 0;
+            padding: 6px 0;
             position: sticky;
-            width: 100%;
             top: 0;
+            width: 100%;
         }
         .container {
             max-width: 800px;
@@ -103,7 +103,113 @@
             </ul>
         </article>
 
-        <!-- Additional functions described similarly -->
+        <article>
+            <h3>3. <code>move_obstacles</code></h3>
+            <p><strong>Purpose:</strong> Moves obstacles downward and removes those that leave the screen.</p>
+            <p><strong>Effect:</strong> Increases the player’s score when obstacles pass off-screen.</p>
+        </article>
+
+        <article>
+            <h3>4. <code>create_coin</code></h3>
+            <p><strong>Purpose:</strong> Spawns a collectible coin at the top of the screen at random positions.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Avoids overlaps with existing obstacles.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>5. <code>move_coin</code></h3>
+            <p><strong>Purpose:</strong> Moves the coin downward and removes it if it leaves the screen.</p>
+            <p><strong>Returns:</strong> The updated coin object or <code>None</code> if the coin is removed.</p>
+        </article>
+
+        <article>
+            <h3>6. <code>create_life_power_up</code></h3>
+            <p><strong>Purpose:</strong> Spawns a life power-up at the top of the screen at random positions.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Avoids overlaps with existing obstacles and the coin.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>7. <code>move_life_power_up</code></h3>
+            <p><strong>Purpose:</strong> Moves the life power-up downward and removes it if it leaves the screen.</p>
+            <p><strong>Returns:</strong> The updated life power-up object or <code>None</code> if removed.</p>
+        </article>
+
+        <article>
+            <h3>8. <code>check_collision</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collides with any obstacles.</p>
+            <p><strong>Effect:</strong> Reduces player lives and clears obstacles on collision.</p>
+            <p><strong>Returns:</strong> Boolean indicating if a collision occurred.</p>
+        </article>
+
+        <article>
+            <h3>9. <code>check_coin_collection</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collects a coin.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Increases lives and score.</li>
+                <li>Increases game difficulty by spawning obstacles faster and speeding them up.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>10. <code>check_life_power_up_collection</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collects a life power-up.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Grants an extra life.</li>
+                <li>Adds points to the score.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>11. <code>shoot_bullet</code></h3>
+            <p><strong>Purpose:</strong> Fires a bullet from the player’s position.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Bullets are added to a global list and move upwards.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>12. <code>move_bullets</code></h3>
+            <p><strong>Purpose:</strong> Moves bullets upward and checks for collisions with obstacles.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Removes obstacles and bullets upon collision.</li>
+                <li>Increases score.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>13. <code>draw</code></h3>
+            <p><strong>Purpose:</strong> Renders all game elements on the screen.</p>
+            <p><strong>Components Rendered:</strong></p>
+            <ul>
+                <li>Background, player, obstacles, bullets, coins, power-ups, lives, and score.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>14. <code>draw_game_over</code></h3>
+            <p><strong>Purpose:</strong> Displays the "Game Over" screen with the final score and restart/quit options.</p>
+        </article>
+
+        <article>
+            <h3>15. <code>game_loop</code></h3>
+            <p><strong>Purpose:</strong> The main loop of the game that handles gameplay logic, rendering, and events.</p>
+            <p><strong>Key Tasks:</strong></p>
+            <ul>
+                <li>Handles user inputs for movement and shooting.</li>
+                <li>Updates game elements (e.g., obstacles, coins, power-ups).</li>
+                <li>Detects collisions and checks win/loss conditions.</li>
+                <li>Displays the game over screen if the player loses all lives.</li>
+            </ul>
+        </article>
 
     </section>
 
