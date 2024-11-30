@@ -223,7 +223,7 @@ def move_bullets():
 #-----------starts design part--------------
 
 # OpenCV Video Capture
-video_path = "Assets\display6.mp4"  # Replace with your video file
+video_path = "Assets\display5.mp4"  # Replace with your video file
 cap = cv2.VideoCapture(video_path)
 
 if not cap.isOpened():
@@ -232,7 +232,7 @@ if not cap.isOpened():
 
 # Load images 
 background_image = pygame.image.load("Assets\display3.jpg").convert_alpha()
-background_image2 = pygame.image.load("Assets\display2.png").convert_alpha()
+background_image2 = pygame.image.load("Assets\display7.jpg").convert_alpha()
 player_image = pygame.image.load("Assets\player2.png").convert_alpha()
 obstacle_image = pygame.image.load("Assets\enemy2.png").convert_alpha()
 # bullet_image = pygame.image.load("Assets\bullet.png").convert_alpha()
@@ -289,7 +289,7 @@ def draw_game_over():
     """Display Game Over screen with the final score."""
     # screen.fill((0, 0, 0))  # Clear the screen with black
     screen.blit(background_image2, (0, 0))
-    game_over_text = font.render("GAME OVER", True, (255, 0, 0))
+    game_over_text = font.render("GAME OVER", True, YELLOW)
     score_text = font.render(f"Score: {score}", True, GREEN)
     restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
     

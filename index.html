@@ -3,247 +3,473 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Fighter Game Documentation</title>
+    <title>Space Fighter Game: Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: #f9f9f9;
             color: #333;
         }
         header {
             background-color: #333;
-            color: #f4f4f9;
+            color: white;
             text-align: center;
+            padding: 5px 0;
+            position: sticky;
+            top: 0;
             width: 100%;
-            padding: 10px 0px;
-        }
-        header h1 {
-            color: #f4f4f9;;
         }
         .container {
-            max-width: 1200px;
+            max-width: 850px;
             margin: auto;
-            padding: 20px;
-            background: #fff;
+            padding: 20px 50px;
+            background: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        h1, h2, h3 {
+        h2, h3 {
             color: #444;
         }
         code {
-            background: #f1f1f1;
+            background: #f4f4f4;
             padding: 2px 4px;
             border-radius: 3px;
-            line-height: 3cap;
         }
         pre {
-            background: #f1f1f1;
+            background: #f4f4f4;
             padding: 10px;
-            border-radius: 3px;
+            border-radius: 5px;
             overflow-x: auto;
+        }
+        ul {
+            list-style: disc;
+            margin-left: 20px;
         }
         footer {
             text-align: center;
+            padding: 10px 0;
             background: #333;
-            color: #fff;
-            width: 100%;
+            color: white;
             bottom: 0;
-            padding: 10px 0px;
+            width: 100%;
         }
-        .section {
-            margin-bottom: 20px;
+        .part{
+            text-align: center;
+        }
+        .image{
+            width: 410px;
         }
     </style>
 </head>
 <body>
-    <header >
-        <h1>Space Fighter Game Documentation</h1>
-    </header>
 
-    <div class="container">
-        <div class="section">
-            <h2>Overview</h2>
-            <p >The Space Fighter Game is an arcade-style game where players control a spaceship to dodge obstacles, collect coins, and gain lives while shooting at enemies. This Python application is developed using the <code>pygame</code> library and integrates elements such as animations and OpenCV video rendering.</p>
-        </div>
+<header>
+    <h1>Space Fighter Game: Report</h1>
+</header>
 
-        <div class="section">
-            <h2>Game Features</h2>
-            <ul>
-                <li>Player controls for movement and shooting</li>
-                <li>Dynamic obstacles and power-ups</li>
-                <li>Collision detection and scoring</li>
-                <li>Video background integration using OpenCV</li>
-                <li>Game Over and restart functionality</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Code Structure</h2>
-            <h3>Initialization</h3>
-            <p>The game initializes with the <code>pygame.init()</code> function and sets up the display, clock, and game variables.</p>
-
-            <h3>Key Components</h3>
-            <ul>
-                <li><strong>Player:</strong> The spaceship controlled by the player, defined by its position, size, and speed.</li>
-                <li><strong>Obstacles:</strong> Enemies that move down the screen. Colliding with them reduces the player's lives.</li>
-                <li><strong>Coins and Power-Ups:</strong> Collectibles that enhance gameplay, such as granting extra lives or points.</li>
-                <li><strong>Bullets:</strong> Projectiles fired by the player to destroy obstacles.</li>
-                <li><strong>Background:</strong> A dynamic video background implemented using OpenCV.</li>
-            </ul>
-
-            <pre><code>// Example: Creating and moving an obstacle
-function createObstacle() {
-    // Logic to avoid overlap and spawn at random positions
-}
-
-function moveObstacles() {
-    // Logic to move obstacles down the screen
-}
-</code></pre>
-        </div>
-
-        <div class="section">
-            <h2>Core Functions</h2>
-            <ul>
-                <li><code>create_obstacle()</code>: Creates obstacles at random positions.</li>
-                <li><code>move_obstacles()</code>: Moves obstacles and removes them when they go off-screen.</li>
-                <li><code>check_collision()</code>: Detects collisions between the player and obstacles.</li>
-                <li><code>shoot_bullet()</code>: Fires bullets from the player's position.</li>
-                <li><code>draw()</code>: Renders all game elements on the screen.</li>
-                <li><code>draw_game_over()</code>: Displays the game-over screen.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Game Loop</h2>
-            <p>The main game logic is implemented within the <code>game_loop()</code> function. It handles user inputs, updates game elements, and checks for events like collisions or collecting power-ups.</p>
-
-            <pre><code>
-def game_loop():
-    global player_x, player_y, lives, coin, life_power_up, score, obstacle_speed, min_obstacle_gap, obstacle_spawn_rate
+<div class="container">
     
-    # Create initial obstacles
-    create_obstacle()
-    
-    running = True
-    game_over = False
-    
-    while running:
-        # Set FPS (frames per second)
-        clock.tick(60)
-        
-        # Event handling
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                cap.release()
-                pygame.quit()
-            elif not game_over:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        shoot_bullet()
-            else:  # Game Over event handling
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:  # Restart game
-                        game_over = False
-                        running = True
-                        lives = 3
-                        score = 0
-                        obstacle_speed = 5
-                        obstacle_spawn_rate = 3
-                        min_obstacle_gap = 60
-                        obstacles.clear()
-                        create_obstacle()
-                    elif event.key == pygame.K_q:  # Quit game
-                        running = False
-                        cap.release()
-                        pygame.quit()
-                        
-        if not game_over:
-            # Move player based on user input (left , right , up , down)
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT] and player_x > 0:
-                player_x -= player_speed
-            if keys[pygame.K_RIGHT] and player_x < width - player_width:
-                player_x += player_speed
-            # Vertical movement
-            if keys[pygame.K_UP] and player_y > 0:
-                player_y -= player_speed
-            if keys[pygame.K_DOWN] and player_y < height - player_height: 
-                player_y += player_speed
-            
-            # Move obstacles, bullets, coin, and power-up
-            move_obstacles()
-            move_bullets()
-            coin = move_coin()
-            life_power_up = move_life_power_up()
-            
-            # Check collisions and collections
-            if check_collision():
-                lives -= 1  # Decrease life on collision
-                if lives <= 0:
-                    # running = False  # End the game if no lives are left
-                    game_over = True
-                else:
-                    obstacles.clear()  # Clear obstacles after collision for a fresh start
-            
-            check_coin_collection()
-            check_life_power_up_collection()
-            
-            # Periodically create new obstacles based on the increased difficulty
-            if random.randint(1, 100) < obstacle_spawn_rate:
-                create_obstacle()
-            
-            # Read the next frame from the video
-            ret, frame = cap.read()
-            if not ret:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart video when it ends
-                continue
+    <section>
+        <h2>Project Overview</h2>
+        <p>The Space Fighter Game is an arcade-style shooting game developed using Python and the Pygame library. This report provides a detailed breakdown of the code structure, including descriptions of every function and its role in the game. The game challenges players to control a spaceship, avoid obstacles, collect coins and power-ups, and shoot down enemies.</p>
+    </section>
 
-            # Convert the frame to a Pygame surface
-            video_surface = pygame.surfarray.make_surface(frame)
+    <section>
+        <img class="image" src="Assets/game3.jpg" alt="">
+        <img class="image" src="Assets/game5.jpg" alt="">
+    </section>
 
-            # Draw the frame and game elements
-            draw(video_surface)
-
-        # Handle Game Over
-        if game_over:
-            draw_game_over()
-
-</code></pre>
-        </div>
-
-        <div class="section">
-            <h2>Dependencies</h2>
-            <ul>
-                <li><a href="https://www.pygame.org/">Pygame</a>: Library for graphics and input handling.</li>
-                <li><a href="https://opencv.org/">OpenCV</a>: For video playback and manipulation.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>How to Run</h2>
-            <ol>
-                <li>Install the required libraries: <code>pip install pygame opencv-python</code></li>
-                <li>Ensure the assets (images, video) are in the specified paths.</li>
-                <li>Run the script: <code>python game.py</code></li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h2>Future Improvements</h2>
-            <ul>
-                <li>Add more power-ups and enemy types.</li>
-                <li>Introduce levels with increasing difficulty.</li>
-                <li>Optimize collision detection for better performance.</li>
-            </ul>
-        </div>
+    <div class="section">
+        <h2>Game Features</h2>
+        <ul>
+            <li>Player controls for movement and shooting</li>
+            <li>Dynamic obstacles and power-ups</li>
+            <li>Collision detection and scoring</li>
+            <li>Video background integration using OpenCV</li>
+            <li>Game Over and restart functionality</li>
+        </ul>
     </div>
 
-    <footer>
-        <p>&copy; 2024 Space Fighter Game Documentation</p>
-    </footer>
+    <section>
+        <h2>Game Structure</h2>
+        <h3>Initialization</h3>
+        <ul>
+            <li><strong>Pygame Initialization:</strong> The game begins by initializing Pygame with <code>pygame.init()</code>.</li>
+            <li><strong>Screen Setup:</strong> The game window is set to 800x700 pixels.</li>
+            <li><strong>Global Variables:</strong> These include player attributes, obstacle parameters, coin and power-up configurations, and the score.</li>
+            <li><strong>Asset Loading:</strong> Backgrounds, player sprites, obstacles, and other images are loaded and scaled to fit the game dimensions.</li>
+        </ul>
+    </section>
+
+    <div class="section">
+        <h2>Core Functions</h2>
+        <ul>
+            <li><code>create_obstacle()</code>: Creates obstacles at random positions.</li>
+            <li><code>move_obstacles()</code>: Moves obstacles and removes them when they go off-screen.</li>
+            <li><code>check_collision()</code>: Detects collisions between the player and obstacles.</li>
+            <li><code>shoot_bullet()</code>: Fires bullets from the player's position.</li>
+            <li><code>draw()</code>: Renders all game elements on the screen.</li>
+            <li><code>draw_game_over()</code>: Displays the game-over screen.</li>
+        </ul>
+    </div>
+
+    <section>
+        <h2>Functions and Their Roles</h2>
+        <article>
+            <h3>1. <code>is_overlapping</code></h3>
+            <p><strong>Purpose:</strong> Determines if two rectangles overlap. Used to check collisions between game elements like obstacles and the player.</p>
+            <p><strong>Parameters:</strong></p>
+            <ul>
+                <li><code>x1, y1, w1, h1:</code> Coordinates and dimensions of the first rectangle.</li>
+                <li><code>x2, y2, w2, h2:</code> Coordinates and dimensions of the second rectangle.</li>
+            </ul>
+            <p><strong>Returns:</strong> Boolean indicating overlap.</p>
+        </article>
+
+        <article>
+            <h3>2. <code>create_obstacle</code></h3>
+            <p><strong>Purpose:</strong> Spawns new obstacles at random x-coordinates while avoiding overlaps with other objects.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Attempts up to 20 times to place the obstacle without overlapping.</li>
+                <li>Increments the obstacle count and spawns coins or power-ups periodically.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>3. <code>move_obstacles</code></h3>
+            <p><strong>Purpose:</strong> Moves obstacles downward and removes those that leave the screen.</p>
+            <p><strong>Effect:</strong> Increases the player’s score when obstacles pass off-screen.</p>
+        </article>
+
+        <article>
+            <h3>4. <code>create_coin</code></h3>
+            <p><strong>Purpose:</strong> Spawns a collectible coin at the top of the screen at random positions.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Avoids overlaps with existing obstacles.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>5. <code>move_coin</code></h3>
+            <p><strong>Purpose:</strong> Moves the coin downward and removes it if it leaves the screen.</p>
+            <p><strong>Returns:</strong> The updated coin object or <code>None</code> if the coin is removed.</p>
+        </article>
+
+        <article>
+            <h3>6. <code>create_life_power_up</code></h3>
+            <p><strong>Purpose:</strong> Spawns a life power-up at the top of the screen at random positions.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Avoids overlaps with existing obstacles and the coin.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>7. <code>move_life_power_up</code></h3>
+            <p><strong>Purpose:</strong> Moves the life power-up downward and removes it if it leaves the screen.</p>
+            <p><strong>Returns:</strong> The updated life power-up object or <code>None</code> if removed.</p>
+        </article>
+
+        <article>
+            <h3>8. <code>check_collision</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collides with any obstacles.</p>
+            <p><strong>Effect:</strong> Reduces player lives and clears obstacles on collision.</p>
+            <p><strong>Returns:</strong> Boolean indicating if a collision occurred.</p>
+        </article>
+
+        <article>
+            <h3>9. <code>check_coin_collection</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collects a coin.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Increases lives and score.</li>
+                <li>Increases game difficulty by spawning obstacles faster and speeding them up.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>10. <code>check_life_power_up_collection</code></h3>
+            <p><strong>Purpose:</strong> Checks if the player collects a life power-up.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Grants an extra life.</li>
+                <li>Adds points to the score.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>11. <code>shoot_bullet</code></h3>
+            <p><strong>Purpose:</strong> Fires a bullet from the player’s position.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Bullets are added to a global list and move upwards.</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>12. <code>move_bullets</code></h3>
+            <p><strong>Purpose:</strong> Moves bullets upward and checks for collisions with obstacles.</p>
+            <p><strong>Effect:</strong></p>
+            <ul>
+                <li>Removes obstacles and bullets upon collision.</li>
+                <li>Increases score.</li>
+            </ul>
+        </article>
+        
+        <h2 class="part">-----ID:1103_Sazzad----Graphic Part-----</h2>
+        <article>
+            <h3>13. <code>draw():</code></h3>
+            <p><strong>Purpose:</strong> Renders all game elements on the screen.</p>
+            <p><strong>Components Rendered:</strong></p>
+            <ul>
+                <li>Background, player, obstacles, bullets, coins, power-ups, lives, and score.</li>
+            </ul>
+            <pre><code>
+                # OpenCV Video Capture
+                video_path = "Assets\display6.mp4"  # Replace with your video file
+                cap = cv2.VideoCapture(video_path)
+                
+                if not cap.isOpened():
+                    print("Error: Could not open video.")
+                    exit()
+                
+                # Load images 
+                background_image = pygame.image.load("Assets\display3.jpg").convert_alpha()
+                background_image2 = pygame.image.load("Assets\display2.png").convert_alpha()
+                player_image = pygame.image.load("Assets\player2.png").convert_alpha()
+                obstacle_image = pygame.image.load("Assets\enemy2.png").convert_alpha()
+                coin_image = pygame.image.load("Assets\life2.png").convert_alpha()
+                life_power_up_image = pygame.image.load("Assets\coin1.png").convert_alpha()
+                
+                # Scale images to match the dimensions used in the original drawing
+                background_image = pygame.transform.scale(background_image, (width, height))
+                background_image2 = pygame.transform.scale(background_image2, (width, height))
+                player_image = pygame.transform.scale(player_image, (player_width, player_height))
+                obstacle_image = pygame.transform.scale(obstacle_image, (obstacle_width, obstacle_height))
+                coin_image = pygame.transform.scale(coin_image, (coin_width, coin_height))
+                life_power_up_image = pygame.transform.scale(life_power_up_image, (life_width, life_height))
+                fps = 30
+                
+                def draw(video_frame):
+                    """Draw all game elements on the screen with images"""
+                    screen.blit(pygame.transform.rotate(video_frame, -90), (0, 0))
+                    
+                    # Draw player image
+                    screen.blit(player_image, (player_x, player_y))
+                    
+                    # Draw obstacle images
+                    for obstacle in obstacles:
+                        screen.blit(obstacle_image, (obstacle[0], obstacle[1]))
+                    
+                    # Draw bullet images
+                    for bullet in bullets:
+                        pygame.draw.rect(screen, YELLOW, (bullet[0], bullet[1], bullet_width, bullet_height))
+                    
+                    # Draw coin image if it exists 
+                    if coin:
+                        screen.blit(coin_image, (coin[0], coin[1]))
+                    
+                    # Draw life power-up image if it exists
+                    if life_power_up:
+                        screen.blit(life_power_up_image, (life_power_up[0], life_power_up[1]))
+                    
+                    # Display lives and score
+                    lives_text = font.render(f'Lives: {lives}', True, WHITE)
+                    screen.blit(lives_text, (10, 10))
+                    score_text = font.render(f'Score: {score}', True, WHITE)
+                    screen.blit(score_text, (10, 50))
+                    
+                    pygame.display.flip()
+            </code></pre>
+        </article>
+
+        <article>
+            <h3>14. <code>draw_game_over():</code></h3>
+            <p><strong>Purpose:</strong> Displays the "Game Over" screen with the final score and restart/quit options.</p>
+            <pre><code>
+                def draw_game_over():
+                    """Display Game Over screen with the final score."""
+                    # screen.fill((0, 0, 0))  # Clear the screen with black
+                    screen.blit(background_image2, (0, 0))
+                    game_over_text = font.render("GAME OVER", True, (255, 0, 0))
+                    score_text = font.render(f"Score: {score}", True, GREEN)
+                    restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
+                    
+                    # Center the text on the screen
+                    screen.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 2 - 100))
+                    screen.blit(score_text, (width // 2 - score_text.get_width() // 2, height // 2))
+                    screen.blit(restart_text, (width // 2 - restart_text.get_width() // 2, height // 2 + 50))
+                    
+                    pygame.display.flip()
+            </code></pre>
+        </article>
+
+        <article>
+            <h3>15. <code>game_loop</code></h3>
+            <p><strong>Purpose:</strong> The main loop of the game that handles gameplay logic, rendering, and events.</p>
+            <pre><code>
+                def game_loop():
+                    global player_x, player_y, lives, coin, life_power_up, score, obstacle_speed, min_obstacle_gap, obstacle_spawn_rate
+                    
+                    # Create initial obstacles
+                    create_obstacle()
+                    
+                    running = True
+                    game_over = False
+                    
+                    while running:
+                        # Set FPS (frames per second)
+                        clock.tick(60)
+                        
+                        # Event handling
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                running = False
+                                cap.release()
+                                pygame.quit()
+                            elif not game_over:
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_SPACE:
+                                        shoot_bullet()
+                            else:  # Game Over event handling
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_r:  # Restart game
+                                        game_over = False
+                                        running = True
+                                        lives = 3
+                                        score = 0
+                                        obstacle_speed = 5
+                                        obstacle_spawn_rate = 3
+                                        min_obstacle_gap = 60
+                                        obstacles.clear()
+                                        create_obstacle()
+                                    elif event.key == pygame.K_q:  # Quit game
+                                        running = False
+                                        cap.release()
+                                        pygame.quit()
+                                        
+                        if not game_over:
+                            # Move player based on user input (left , right , up , down)
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_LEFT] and player_x > 0:
+                                player_x -= player_speed
+                            if keys[pygame.K_RIGHT] and player_x < width - player_width:
+                                player_x += player_speed
+                            # Vertical movement
+                            if keys[pygame.K_UP] and player_y > 0:
+                                player_y -= player_speed
+                            if keys[pygame.K_DOWN] and player_y < height - player_height: 
+                                player_y += player_speed
+                            
+                            # Move obstacles, bullets, coin, and power-up
+                            move_obstacles()
+                            move_bullets()
+                            coin = move_coin()
+                            life_power_up = move_life_power_up()
+                            
+                            # Check collisions and collections
+                            if check_collision():
+                                lives -= 1  # Decrease life on collision
+                                if lives <= 0:
+                                    # running = False  # End the game if no lives are left
+                                    game_over = True
+                                else:
+                                    obstacles.clear()  # Clear obstacles after collision for a fresh start
+                            
+                            check_coin_collection()
+                            check_life_power_up_collection()
+                            
+                            # Periodically create new obstacles based on the increased difficulty
+                            if random.randint(1, 100) < obstacle_spawn_rate:
+                                create_obstacle()
+                            
+                            # Read the next frame from the video
+                            ret, frame = cap.read()
+                            if not ret:
+                                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart video when it ends
+                                continue
+                
+                            # Convert the frame to a Pygame surface
+                            video_surface = pygame.surfarray.make_surface(frame)
+                
+                            # Draw the frame and game elements
+                            draw(video_surface)
+                
+                        # Handle Game Over
+                        if game_over:
+                            draw_game_over()
+                
+                </code></pre>
+            <p><strong>Key Tasks:</strong></p>
+            <ul>
+                <li>Handles user inputs for movement and shooting.</li>
+                <li>Updates game elements (e.g., obstacles, coins, power-ups).</li>
+                <li>Detects collisions and checks win/loss conditions.</li>
+                <li>Displays the game over screen if the player loses all lives.</li>
+            </ul>
+        </article>
+
+    </section>
+
+    <section>
+        <h2>Dependencies</h2>
+        <ul>
+            <li><a href="https://www.pygame.org/docs/">Pygame</a>: Library for graphics and input handling.</li>
+            <li><a href="https://www.geeksforgeeks.org/python-play-a-video-using-opencv/">OpenCV</a>: For video playback and manipulation.</li>
+        </ul>
+        <h3>Pygame</h3>
+        <ul>
+            <li><code>pygame.init()</code>: Initializes the Pygame library.</li>
+            <li><code>pygame.display.set_mode()</code>: Sets up the game window.</li>
+            <li><code>pygame.display.set_caption()</code>: Sets the window title.</li>
+            <li><code>pygame.image.load()</code>: Loads images for the game.</li>
+            <li><code>pygame.transform.scale()</code>: Resizes images.</li>
+            <li><code>pygame.surfarray.make_surface()</code>: Converts video frames to Pygame surfaces.</li>
+            <li><code>pygame.font.SysFont()</code>: Creates fonts for rendering text.</li>
+            <li><code>pygame.draw.rect()</code>: Draws rectangles for bullets.</li>
+            <li><code>pygame.key.get_pressed()</code>: Captures real-time key presses.</li>
+            <li><code>pygame.event.get()</code>: Processes user events like key presses and quits.</li>
+            <li><code>pygame.quit()</code>: Closes the Pygame application.</li>
+            <li><code>pygame.time.Clock()</code>: Controls the frame rate.</li>
+        </ul>
+        <h3>OpenCV</h3>
+        <ul>
+            <li><code>cv2.VideoCapture()</code>: Opens video files.</li>
+            <li><code>cv2.VideoCapture.read()</code>: Reads frames from a video.</li>
+            <li><code>cv2.CAP_PROP_POS_FRAMES</code>: Sets or gets the current frame position in a video.</li>
+            <li><code>cv2.cvtColor()</code>: Converts image colors (not used explicitly in this code).</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Execution Steps</h2>
+        <ol>
+            <li>Ensure required libraries are installed:</li>
+            <pre><code>pip install pygame opencv-python</code></pre>
+            <li>Place all required assets (images and video) in the specified directories.</li>
+            <li>Run the game script:</li>
+            <pre><code>python game.py</code></pre>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Future Improvements</h2>
+        <ul>
+            <li>Introduce more levels with varying difficulties.</li>
+            <li>Add more enemy types and power-ups.</li>
+            <li>Enhance visual effects and animations.</li>
+            <li>Implement multiplayer functionality.</li>
+        </ul>
+    </section>
+</div>
+
+<footer>
+    <p>&copy; 2024 Space Fighter Game: Report</p>
+</footer>
+
 </body>
 </html>
