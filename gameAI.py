@@ -1,4 +1,5 @@
 import pygame
+import heapq
 import random
 import cv2
 from os.path import join
@@ -19,13 +20,13 @@ BLUE = (0, 0, 255)
 PINK = (255, 105, 180)
 
 # Define player attributes
-player_width, player_height = 60, 60
+player_width, player_height = 50, 50
 player_x, player_y = width // 2 - player_width // 2, height - player_height - 10
 player_speed = 8
 lives = 3  # Player starts with 3 lives
 
 # Define obstacle attributes
-obstacle_width, obstacle_height = 45, 45
+obstacle_width, obstacle_height = 40, 40
 obstacle_speed = 5  
 obstacles = []
 obstacle_count = 0  # Track how many obstacles have been created
@@ -44,6 +45,12 @@ coin = None  # Initially, no coin exists
 # Define life power-up attributes
 life_width, life_height = 40, 40
 life_power_up = None  # Initially, no life power-up exists
+
+"""extra for movement"""
+target_x, target_y = player_x, player_y  # Initialize target position
+movement_delay = 5  # Frames between movements
+movement_counter = 0
+smooth_speed = 5  # Pixels per frame for smooth movement
 
 # Define the clock
 clock = pygame.time.Clock()
@@ -88,7 +95,7 @@ def create_obstacle():
     
     # Increment obstacle count and check if a coin or life power-up should appear
     obstacle_count += 1
-    if obstacle_count % 30 == 0:  # Every 30 obstacles, create a coin
+    if obstacle_count % 20 == 0:  # Every 30 obstacles, create a coin
         create_coin()
     if obstacle_count % 50 == 0:  # Every 50 obstacles, create a life power-up
         create_life_power_up()
@@ -180,7 +187,8 @@ def check_coin_collection():
     if coin:
         if (player_x + player_width > coin[0] and player_x < coin[0] + coin_width and
             player_y + player_height > coin[1] and player_y < coin[1] + coin_height):
-            lives += 1  # Gain an extra life
+            # if lives < 10:
+            #     lives += 1  # Gain an extra life
             score += 10  # Gain score for collecting a coin
             coin = None  # Remove the coin after collection
             
@@ -195,8 +203,9 @@ def check_life_power_up_collection():
     if life_power_up:
         if (player_x + player_width > life_power_up[0] and player_x < life_power_up[0] + life_width and
             player_y + player_height > life_power_up[1] and player_y < life_power_up[1] + life_height):
-            lives += 1  # Gain an extra life
-            score += 20  # Gain score for collecting a life power-up
+            if lives < 10:
+                lives += 1  # Gain an extra life
+            # score += 20  # Gain score for collecting a life power-up
             life_power_up = None  # Remove the life power-up after collection
 
 def shoot_bullet():
@@ -220,7 +229,7 @@ def move_bullets():
     bullets[:] = [bullet for bullet in bullets if bullet[1] > 0]
 
 
-#-----------starts design part--------------
+#-------------starts graphic part--------------
 
 # OpenCV Video Capture
 video_path = "Assets\display5.mp4"  # Replace with your video file
@@ -236,8 +245,8 @@ background_image2 = pygame.image.load("Assets\display7.jpg").convert_alpha()
 player_image = pygame.image.load("Assets\player2.png").convert_alpha()
 obstacle_image = pygame.image.load("Assets\enemy2.png").convert_alpha()
 # bullet_image = pygame.image.load("Assets\bullet.png").convert_alpha()
-coin_image = pygame.image.load("Assets\life2.png").convert_alpha()
-life_power_up_image = pygame.image.load("Assets\coin1.png").convert_alpha()
+coin_image = pygame.image.load("Assets\coin1.png").convert_alpha()
+life_power_up_image = pygame.image.load("Assets\life2.png").convert_alpha()
 
 # Scale images to match the dimensions used in the original drawing
 background_image = pygame.transform.scale(background_image, (width, height))
@@ -301,100 +310,226 @@ def draw_game_over():
     pygame.display.flip()
 
 
+# -----------------------A* Algorithm Implementation-----------------------------
+
+def a_star(start, target, obstacles, grid_size):
+    """A* pathfinding algorithm."""
+    rows, cols = grid_size
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, target)}
+
+    while open_set:
+        _, current = heapq.heappop(open_set)
+
+        if current == target:
+            return reconstruct_path(came_from, current)
+
+        for neighbor in get_neighbors(current, rows, cols):
+            if neighbor in obstacles:
+                continue
+
+            tentative_g_score = g_score[current] + 1
+            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = tentative_g_score + heuristic(neighbor, target)
+                heapq.heappush(open_set, (f_score[neighbor], neighbor))
+
+    return None  # No path found
+
+def heuristic(pos, target):
+    """Manhattan distance heuristic."""
+    return abs(pos[0] - target[0]) + abs(pos[1] - target[1])
+
+def get_neighbors(pos, rows, cols):
+    """Get all possible neighbors for a given position."""
+    x, y = pos
+    neighbors = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    return [(nx, ny) for nx, ny in neighbors if 0 <= nx < cols and 0 <= ny < rows]
+
+def reconstruct_path(came_from, current):
+    """Reconstruct the path from start to target."""
+    path = []
+    while current in came_from:
+        path.append(current)
+        current = came_from[current]
+    return path[::-1]
+
+def predict_obstacle_positions(obstacles, speed, grid_size, steps=3):
+    """Predict future positions of obstacles based on their speed and direction."""
+    future_positions = set(obstacles)  # Start with current positions
+    rows, cols = grid_size
+
+    for _ in range(steps):  # Predict for the next few steps
+        new_positions = set()
+        for x, y in future_positions:
+            y += speed  # Move obstacle down
+            if 0 <= y < rows:  # Ensure within bounds
+                new_positions.add((x, y))
+        future_positions.update(new_positions)
+
+    return future_positions
+
+def avoid_obstacles(player_pos, obstacles, grid_size):
+    """Basic obstacle avoidance mechanism."""
+    rows, cols = grid_size
+    x, y = player_pos
+
+    # Check nearby obstacles
+    dangerous_positions = {(ox, oy) for ox, oy in obstacles if abs(oy - y) <= 2 and abs(ox - x) <= 1}
+
+    # Decide the safest move
+    possible_moves = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    safe_moves = [move for move in possible_moves if move not in dangerous_positions and 0 <= move[0] < cols and 0 <= move[1] < rows]
+
+    if safe_moves:
+        # Prioritize moves that stay in the center of the screen
+        return min(safe_moves, key=lambda pos: abs(pos[0] - cols // 2))
+    return player_pos  # Stay in place if no safe moves
+
+def handle_potential_collisions(player_x, player_y, obstacles, player_width, bullet_ready=True):
+    """Check for obstacles that may collide with the spaceship and fire bullets if needed."""
+    for obstacle in obstacles:
+        obstacle_x, obstacle_y = obstacle
+        # Check if the obstacle is within the collision path
+        if abs(obstacle_y - player_y) < height // 4:  # Vertical proximity
+            if abs(obstacle_x - player_x) < player_width:  # Horizontally aligned
+                # Fire bullet if aligned
+                if bullet_ready:
+                    shoot_bullet()
+                return player_x, player_y
+            
+            # Align horizontally if not already aligned
+            if obstacle_x > player_x:
+                player_x += player_speed
+            elif obstacle_x < player_x:
+                player_x -= player_speed
+            return player_x, player_y
+
+    return player_x, player_y  # No immediate threat
+
+
+def ai_control_with_dynamic_replanning(player_pos, coin_pos, life_pos, obstacles, grid_size, return_to_base=False):
+    """AI control with dynamic replanning to avoid moving obstacles."""
+    target = None
+    
+    if return_to_base:  # If returning to base
+        target = (player_pos[0], grid_size[0] - 1)  # Closest point on the bottom row
+    elif life_pos:
+        target = life_pos  # Prioritize life power-up
+    elif coin_pos:
+        target = coin_pos  # Go for coin if no life power-up
+
+    # Pathfinding logic
+    if target:
+        future_obstacles = predict_obstacle_positions(obstacles, speed=1, grid_size=grid_size)
+        path = a_star(player_pos, target, future_obstacles, grid_size)
+        if path and len(path) > 1:
+            return path[1]  # Take the next step towards the target
+
+    # Default movement mechanism: Avoid obstacles
+    next_move = avoid_obstacles(player_pos, obstacles, grid_size)
+
+    # Shoot bullets if obstacles are directly ahead
+    rows, cols = grid_size
+    px, py = player_pos
+    for ox, oy in obstacles:
+        if oy > py and abs(ox - px) <= 50:  # Obstacle directly in front
+            shoot_bullet()  # Call the bullet-shooting function
+            break
+
+    return next_move
+
+
+
+#------------main function--------------
 
 def game_loop():
     global player_x, player_y, lives, coin, life_power_up, score, obstacle_speed, min_obstacle_gap, obstacle_spawn_rate
-    
-    # Create initial obstacles
+
     create_obstacle()
-    
+    return_to_base = False  # Track return-to-base mode
     running = True
     game_over = False
-    
+
     while running:
-        # Set FPS (frames per second)
         clock.tick(60)
-        
-        # Event handling
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 cap.release()
                 pygame.quit()
-            elif not game_over:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        shoot_bullet()
-            else:  # Game Over event handling
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:  # Restart game
-                        game_over = False
-                        running = True
-                        lives = 3
-                        score = 0
-                        obstacle_speed = 5
-                        obstacle_spawn_rate = 3
-                        min_obstacle_gap = 60
-                        obstacles.clear()
-                        create_obstacle()
-                    elif event.key == pygame.K_q:  # Quit game
-                        running = False
-                        cap.release()
-                        pygame.quit()
-                        
-        
+
         if not game_over:
-            # Move player based on user input (left , right , up , down)
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT] and player_x > 0:
-                player_x -= player_speed
-            if keys[pygame.K_RIGHT] and player_x < width - player_width:
-                player_x += player_speed
-            # Vertical movement
-            if keys[pygame.K_UP] and player_y > 0:
-                player_y -= player_speed
-            if keys[pygame.K_DOWN] and player_y < height - player_height: 
-                player_y += player_speed
-            
-            # Move obstacles, bullets, coin, and power-up
+            # Move obstacles
             move_obstacles()
+
+            # Check if coin or life power-up is collected
+            if check_coin_collection():
+                return_to_base = True  # Trigger return-to-base mode
+            if check_life_power_up_collection():
+                return_to_base = True  # Trigger return-to-base mode
+
+            # Handle return-to-base or AI-controlled movement
+            if return_to_base:
+                # Move the spaceship downward with the same speed as the obstacles
+                player_y += obstacle_speed
+
+                # Check if the spaceship has reached the base
+                if player_y >= height - player_height:
+                    return_to_base = False  # Reset return-to-base mode
+            else:
+                # Regular AI control for moving towards coin or life power-up
+                grid_size = (40, 40)  # Define the grid size (e.g., 40x40)
+                player_pos = (player_x // (width // grid_size[1]), player_y // (height // grid_size[0]))
+                coin_pos = (coin[0] // (width // grid_size[1]), coin[1] // (height // grid_size[0])) if coin else None
+                life_pos = (life_power_up[0] // (width // grid_size[1]), life_power_up[1] // (height // grid_size[0])) if life_power_up else None
+                obstacles_grid = [(ob[0] // (width // grid_size[1]), ob[1] // (height // grid_size[0])) for ob in obstacles]
+
+                # Get the next move from AI control
+                next_move = ai_control_with_dynamic_replanning(player_pos, coin_pos, life_pos, obstacles_grid, grid_size)
+
+                # Smoothly move towards the target
+                dx = (next_move[0] * (width // grid_size[1]) - player_x) / smooth_speed
+                dy = (next_move[1] * (height // grid_size[0]) - player_y) / smooth_speed
+                player_x += dx
+                player_y += dy
+
+            # Move other elements
             move_bullets()
             coin = move_coin()
             life_power_up = move_life_power_up()
-            
-            # Check collisions and collections
+
+            # Check collisions
             if check_collision():
-                lives -= 1  # Decrease life on collision
+                lives -= 1
                 if lives <= 0:
-                    # running = False  # End the game if no lives are left
                     game_over = True
                 else:
-                    obstacles.clear()  # Clear obstacles after collision for a fresh start
-            
-            check_coin_collection()
-            check_life_power_up_collection()
-            
-            # Periodically create new obstacles based on the increased difficulty
+                    obstacles.clear()
+
             if random.randint(1, 100) < obstacle_spawn_rate:
                 create_obstacle()
-            
-            # Read the next frame from the video
+
+            # Draw everything
             ret, frame = cap.read()
             if not ret:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart video when it ends
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 continue
 
-            # Convert the frame to a Pygame surface
             video_surface = pygame.surfarray.make_surface(frame)
-
-            # Draw the frame and game elements
             draw(video_surface)
 
-        # Handle Game Over
         if game_over:
             draw_game_over()
-    
-    # pygame.quit()
+
+    pygame.quit()
+
+
 
 # Run the game loop
 game_loop() 

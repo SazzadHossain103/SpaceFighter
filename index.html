@@ -85,6 +85,7 @@
         <h2>Game Features</h2>
         <ul>
             <li>Player controls for movement and shooting</li>
+            <li>Automated AI player control</li>
             <li>Dynamic obstacles and power-ups</li>
             <li>Collision detection and scoring</li>
             <li>Video background integration using OpenCV</li>
@@ -99,7 +100,7 @@
             <li><strong>Pygame Initialization:</strong> The game begins by initializing Pygame with <code>pygame.init()</code>.</li>
             <li><strong>Screen Setup:</strong> The game window is set to 800x700 pixels.</li>
             <li><strong>Global Variables:</strong> These include player attributes, obstacle parameters, coin and power-up configurations, and the score.</li>
-            <li><strong>Asset Loading:</strong> Backgrounds, player sprites, obstacles, and other images are loaded and scaled to fit the game dimensions.</li>
+            <li><strong>Asset Loading:</strong> Backgrounds, spaceship, obstacles, and other images are loaded and scaled to fit the game dimensions.</li>
         </ul>
     </section>
 
@@ -107,11 +108,12 @@
         <h2>Core Functions</h2>
         <ul>
             <li><code>create_obstacle()</code>: Creates obstacles at random positions.</li>
-            <li><code>move_obstacles()</code>: Moves obstacles and removes them when they go off-screen.</li>
+            <li><code>create_coin()</code>: Creates coin at random position.</li>
+            <li><code>create_life_power_up()</code>: Creates life gem at random position.</li>
             <li><code>check_collision()</code>: Detects collisions between the player and obstacles.</li>
             <li><code>shoot_bullet()</code>: Fires bullets from the player's position.</li>
+            <li><code>ai_control()</code>: AI controls the game itself as a player.</li>
             <li><code>draw()</code>: Renders all game elements on the screen.</li>
-            <li><code>draw_game_over()</code>: Displays the game-over screen.</li>
         </ul>
     </div>
 
@@ -119,7 +121,7 @@
         <h2>Functions and Their Roles</h2>
         <article>
             <h3>1. <code>is_overlapping</code></h3>
-            <p><strong>Purpose:</strong> Determines if two rectangles overlap. Used to check collisions between game elements like obstacles and the player.</p>
+            <p><strong>Purpose:</strong> Determines if any obstacle overlap with each other. Used to check collisions between game elements.</p>
             <p><strong>Parameters:</strong></p>
             <ul>
                 <li><code>x1, y1, w1, h1:</code> Coordinates and dimensions of the first rectangle.</li>
@@ -155,8 +157,7 @@
 
         <article>
             <h3>5. <code>move_coin</code></h3>
-            <p><strong>Purpose:</strong> Moves the coin downward and removes it if it leaves the screen.</p>
-            <p><strong>Returns:</strong> The updated coin object or <code>None</code> if the coin is removed.</p>
+            <p><strong>Purpose:</strong> Moves the coin downward and removes it if it leaves the screen or absorbed by the player.</p>
         </article>
 
         <article>
@@ -170,8 +171,7 @@
 
         <article>
             <h3>7. <code>move_life_power_up</code></h3>
-            <p><strong>Purpose:</strong> Moves the life power-up downward and removes it if it leaves the screen.</p>
-            <p><strong>Returns:</strong> The updated life power-up object or <code>None</code> if removed.</p>
+            <p><strong>Purpose:</strong> Moves the life power-up downward and removes it if it leaves the screen or absorbed by the player.</p>
         </article>
 
         <article>
@@ -186,7 +186,7 @@
             <p><strong>Purpose:</strong> Checks if the player collects a coin.</p>
             <p><strong>Effect:</strong></p>
             <ul>
-                <li>Increases lives and score.</li>
+                <li>Increases score.</li>
                 <li>Increases game difficulty by spawning obstacles faster and speeding them up.</li>
             </ul>
         </article>
@@ -197,7 +197,6 @@
             <p><strong>Effect:</strong></p>
             <ul>
                 <li>Grants an extra life.</li>
-                <li>Adds points to the score.</li>
             </ul>
         </article>
 
@@ -220,199 +219,108 @@
             </ul>
         </article>
         
-        <h2 class="part">-----ID:1103_Sazzad----Graphic Part-----</h2>
         <article>
-            <h3>13. <code>draw():</code></h3>
+            <h3>13. <code>a_star</code></h3>
+            <p><strong>Purpose:</strong> Implements the A* pathfinding algorithm to guide AI movement.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Calculates the optimal path from <code>start</code> to <code>target</code> using Manhattan distance as the heuristic.</li>
+                <li>Avoids obstacles and dynamically replans the path.</li>
+            </ul>
+            <p><strong>Returns:</strong> A sequence of positions representing the shortest path.</p>
+        </article>
+        
+        <article>
+            <h3>14. <code>heuristic</code></h3>
+            <p><strong>Purpose:</strong> Calculates the Manhattan distance between a position and the target for use in the A* algorithm.</p>
+        </article>
+        
+        <article>
+            <h3>15. <code>get_neighbors</code></h3>
+            <p><strong>Purpose:</strong> Generates the neighboring cells of a given position, considering grid boundaries.</p>
+            <p><strong>Returns:</strong> A list of valid neighboring positions.</p>
+        </article>
+        
+        <article>
+            <h3>16. <code>reconstruct_path</code></h3>
+            <p><strong>Purpose:</strong> Reconstructs the path from the target back to the start position using the <code>came_from</code> map in A*.</p>
+            <p><strong>Returns:</strong> A list of grid positions representing the optimal path.</p>
+        </article>
+        
+        <article>
+            <h3>17. <code>predict_obstacle_positions</code></h3>
+            <p><strong>Purpose:</strong> Predicts future positions of obstacles based on their current movement and considers the grid positions as blocked cell.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Simulates obstacle movement for a specified number of steps.</li>
+                <li>Useful for dynamic AI planning.</li>
+            </ul>
+            <p><strong>Returns:</strong> A set of obstacle positions projected for a given number of steps.</p>
+        </article>
+        
+        <article>
+            <h3>18. <code>avoid_obstacles</code></h3>
+            <p><strong>Purpose:</strong> Suggests safe moves to help the player avoid nearby obstacles.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Considers proximity and available safe spaces.</li>
+            </ul>
+            <p><strong>Returns:</strong> The optimal position for the player to move.</p>
+        </article>
+        
+        <article>
+            <h3>19. <code>handle_potential_collisions</code></h3>
+            <p><strong>Purpose:</strong> Detects obstacles in the player's path and fires bullets.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Ensures obstacles within vertical proximity are handled.</li>
+                <li>Adjusts player position or shoots bullets to avoid collisions.</li>
+            </ul>
+        </article>
+        
+        <article>
+            <h3>20. <code>ai_control_with_dynamic_replanning</code></h3>
+            <p><strong>Purpose:</strong> Controls AI movement using dynamic replanning.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Prioritizes life power-ups and coins.</li>
+                <li>Uses A* pathfinding to navigate safely.</li>
+                <li>Implements obstacle avoidance and shooting mechanisms.</li>
+            </ul>
+        </article>
+        
+        <article>
+            <h3>21. <code>draw(video_frame)</code></h3>
             <p><strong>Purpose:</strong> Renders all game elements on the screen.</p>
-            <p><strong>Components Rendered:</strong></p>
+            <p><strong>Key Points:</strong></p>
             <ul>
-                <li>Background, player, obstacles, bullets, coins, power-ups, lives, and score.</li>
-            </ul>
-            <pre><code>
-                # OpenCV Video Capture
-                video_path = "Assets\display6.mp4"  # Replace with your video file
-                cap = cv2.VideoCapture(video_path)
-                
-                if not cap.isOpened():
-                    print("Error: Could not open video.")
-                    exit()
-                
-                # Load images 
-                background_image = pygame.image.load("Assets\display3.jpg").convert_alpha()
-                background_image2 = pygame.image.load("Assets\display2.png").convert_alpha()
-                player_image = pygame.image.load("Assets\player2.png").convert_alpha()
-                obstacle_image = pygame.image.load("Assets\enemy2.png").convert_alpha()
-                coin_image = pygame.image.load("Assets\life2.png").convert_alpha()
-                life_power_up_image = pygame.image.load("Assets\coin1.png").convert_alpha()
-                
-                # Scale images to match the dimensions used in the original drawing
-                background_image = pygame.transform.scale(background_image, (width, height))
-                background_image2 = pygame.transform.scale(background_image2, (width, height))
-                player_image = pygame.transform.scale(player_image, (player_width, player_height))
-                obstacle_image = pygame.transform.scale(obstacle_image, (obstacle_width, obstacle_height))
-                coin_image = pygame.transform.scale(coin_image, (coin_width, coin_height))
-                life_power_up_image = pygame.transform.scale(life_power_up_image, (life_width, life_height))
-                fps = 30
-                
-                def draw(video_frame):
-                    """Draw all game elements on the screen with images"""
-                    screen.blit(pygame.transform.rotate(video_frame, -90), (0, 0))
-                    
-                    # Draw player image
-                    screen.blit(player_image, (player_x, player_y))
-                    
-                    # Draw obstacle images
-                    for obstacle in obstacles:
-                        screen.blit(obstacle_image, (obstacle[0], obstacle[1]))
-                    
-                    # Draw bullet images
-                    for bullet in bullets:
-                        pygame.draw.rect(screen, YELLOW, (bullet[0], bullet[1], bullet_width, bullet_height))
-                    
-                    # Draw coin image if it exists 
-                    if coin:
-                        screen.blit(coin_image, (coin[0], coin[1]))
-                    
-                    # Draw life power-up image if it exists
-                    if life_power_up:
-                        screen.blit(life_power_up_image, (life_power_up[0], life_power_up[1]))
-                    
-                    # Display lives and score
-                    lives_text = font.render(f'Lives: {lives}', True, WHITE)
-                    screen.blit(lives_text, (10, 10))
-                    score_text = font.render(f'Score: {score}', True, WHITE)
-                    screen.blit(score_text, (10, 50))
-                    
-                    pygame.display.flip()
-            </code></pre>
-        </article>
-
-        <article>
-            <h3>14. <code>draw_game_over():</code></h3>
-            <p><strong>Purpose:</strong> Displays the "Game Over" screen with the final score and restart/quit options.</p>
-            <pre><code>
-                def draw_game_over():
-                    """Display Game Over screen with the final score."""
-                    # screen.fill((0, 0, 0))  # Clear the screen with black
-                    screen.blit(background_image2, (0, 0))
-                    game_over_text = font.render("GAME OVER", True, (255, 0, 0))
-                    score_text = font.render(f"Score: {score}", True, GREEN)
-                    restart_text = font.render("Press R to Restart or Q to Quit", True, (255, 255, 255))
-                    
-                    # Center the text on the screen
-                    screen.blit(game_over_text, (width // 2 - game_over_text.get_width() // 2, height // 2 - 100))
-                    screen.blit(score_text, (width // 2 - score_text.get_width() // 2, height // 2))
-                    screen.blit(restart_text, (width // 2 - restart_text.get_width() // 2, height // 2 + 50))
-                    
-                    pygame.display.flip()
-            </code></pre>
-        </article>
-
-        <article>
-            <h3>15. <code>game_loop</code></h3>
-            <p><strong>Purpose:</strong> The main loop of the game that handles gameplay logic, rendering, and events.</p>
-            <pre><code>
-                def game_loop():
-                    global player_x, player_y, lives, coin, life_power_up, score, obstacle_speed, min_obstacle_gap, obstacle_spawn_rate
-                    
-                    # Create initial obstacles
-                    create_obstacle()
-                    
-                    running = True
-                    game_over = False
-                    
-                    while running:
-                        # Set FPS (frames per second)
-                        clock.tick(60)
-                        
-                        # Event handling
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                running = False
-                                cap.release()
-                                pygame.quit()
-                            elif not game_over:
-                                if event.type == pygame.KEYDOWN:
-                                    if event.key == pygame.K_SPACE:
-                                        shoot_bullet()
-                            else:  # Game Over event handling
-                                if event.type == pygame.KEYDOWN:
-                                    if event.key == pygame.K_r:  # Restart game
-                                        game_over = False
-                                        running = True
-                                        lives = 3
-                                        score = 0
-                                        obstacle_speed = 5
-                                        obstacle_spawn_rate = 3
-                                        min_obstacle_gap = 60
-                                        obstacles.clear()
-                                        create_obstacle()
-                                    elif event.key == pygame.K_q:  # Quit game
-                                        running = False
-                                        cap.release()
-                                        pygame.quit()
-                                        
-                        if not game_over:
-                            # Move player based on user input (left , right , up , down)
-                            keys = pygame.key.get_pressed()
-                            if keys[pygame.K_LEFT] and player_x > 0:
-                                player_x -= player_speed
-                            if keys[pygame.K_RIGHT] and player_x < width - player_width:
-                                player_x += player_speed
-                            # Vertical movement
-                            if keys[pygame.K_UP] and player_y > 0:
-                                player_y -= player_speed
-                            if keys[pygame.K_DOWN] and player_y < height - player_height: 
-                                player_y += player_speed
-                            
-                            # Move obstacles, bullets, coin, and power-up
-                            move_obstacles()
-                            move_bullets()
-                            coin = move_coin()
-                            life_power_up = move_life_power_up()
-                            
-                            # Check collisions and collections
-                            if check_collision():
-                                lives -= 1  # Decrease life on collision
-                                if lives <= 0:
-                                    # running = False  # End the game if no lives are left
-                                    game_over = True
-                                else:
-                                    obstacles.clear()  # Clear obstacles after collision for a fresh start
-                            
-                            check_coin_collection()
-                            check_life_power_up_collection()
-                            
-                            # Periodically create new obstacles based on the increased difficulty
-                            if random.randint(1, 100) < obstacle_spawn_rate:
-                                create_obstacle()
-                            
-                            # Read the next frame from the video
-                            ret, frame = cap.read()
-                            if not ret:
-                                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Restart video when it ends
-                                continue
-                
-                            # Convert the frame to a Pygame surface
-                            video_surface = pygame.surfarray.make_surface(frame)
-                
-                            # Draw the frame and game elements
-                            draw(video_surface)
-                
-                        # Handle Game Over
-                        if game_over:
-                            draw_game_over()
-                
-                </code></pre>
-            <p><strong>Key Tasks:</strong></p>
-            <ul>
-                <li>Handles user inputs for movement and shooting.</li>
-                <li>Updates game elements (e.g., obstacles, coins, power-ups).</li>
-                <li>Detects collisions and checks win/loss conditions.</li>
-                <li>Displays the game over screen if the player loses all lives.</li>
+                <li>Displays the video background using OpenCV and Pygame.</li>
+                <li>Draws player, bullets, obstacles, coins, and life power-ups.</li>
+                <li>Updates UI elements like the score and remaining lives.</li>
             </ul>
         </article>
-
+        
+        <article>
+            <h3>22. <code>draw_game_over()</code></h3>
+            <p><strong>Purpose:</strong> Displays the "Game Over" screen.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Shows the final score and restart/quit options.</li>
+                <li>Uses a unique background for the Game Over state.</li>
+            </ul>
+        </article>
+        
+        <article>
+            <h3>23. <code>game_loop()</code></h3>
+            <p><strong>Purpose:</strong> The main loop managing the game’s state and rendering.</p>
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li>Updates positions for all elements (obstacles, bullets, power-ups).</li>
+                <li>Handles user input, collision detection, and game logic.</li>
+                <li>Continuously draws the screen or transitions to Game Over.</li>
+            </ul>
+        </article>
+        
     </section>
 
     <section>
@@ -462,6 +370,7 @@
             <li>Introduce more levels with varying difficulties.</li>
             <li>Add more enemy types and power-ups.</li>
             <li>Enhance visual effects and animations.</li>
+            <li>Add gameplay settings to choose spaceship and enemy obstacles.</li>
             <li>Implement multiplayer functionality.</li>
         </ul>
     </section>
